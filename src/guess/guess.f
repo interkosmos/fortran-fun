@@ -42,14 +42,14 @@ C     ******************************************************************
      &' OF A NUMBER BETWEEN 1 AND ANY LIMIT YOU WANT.',/,
      &' THEN YOU HAVE TO GUESS WHAT IT IS.',/,/,
      &' WHAT LIMIT DO YOU WANT? ',$)
-  200 FORMAT (' I AM THINKING OF A NUMBER BETWEEN 1 AND ',I8,' ...',/,
+  200 FORMAT (' I AM THINKING OF A NUMBER BETWEEN 1 AND ',I0,' ...',/,
      &' NOW YOU TRY TO GUESS WHAT IT IS: ',$)
   300 FORMAT (' TOO LOW. TRY A BIGGER ANSWER: ',$)
   400 FORMAT (' TOO HIGH. TRY A SMALLER ANSWER: ',$)
-  500 FORMAT (' THAT''S IT! YOU GOT IT IN ',I2,' TRIES.')
+  500 FORMAT (' THAT''S IT! YOU GOT IT IN ',I0,' TRIES.')
   600 FORMAT (' VERY GOOD.')
   700 FORMAT (' GOOD.')
-  800 FORMAT (' YOU SHOULD HAVE BEEN ABLE TO GET IT IN ONLY ',I3,'.')
+  800 FORMAT (' YOU SHOULD HAVE BEEN ABLE TO GET IT IN ONLY ',I0,'.')
       END
 C     ******************************************************************
       INTEGER FUNCTION INPUT()

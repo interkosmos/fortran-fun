@@ -4,6 +4,7 @@ FC     = gfortran
 FFLAGS = -O2
 
 ACEY       = src/acey/acey.f90
+ACEY77     = src/acey77/acey.f
 AMAZING    = src/amazing/amazing.f90
 BUZZWORD   = src/buzzword/buzzword.f90
 DELMAR     = src/delmar/delmar.f
@@ -26,12 +27,15 @@ WUMPUS     = src/wumpus/wumpus.f
 
 .PHONY: all clean
 
-all: acey amazing buzzword delmar donut french hamurabi hamurabi77 guess \
-     jackpot magic8 oregon penney pi rock rock77 rot13 russian russian77 \
+all: acey acey77 amazing buzzword delmar donut french hamurabi hamurabi77 \
+     guess jackpot magic8 oregon penney pi rock rock77 rot13 russian russian77 \
      wumpus
 
 acey: $(ACEY)
 	$(FC) $(FFLAGS) -o acey $(ACEY)
+
+acey77: $(ACEY77)
+	$(FC) $(FFLAGS) -o acey77 $(ACEY77)
 
 amazing: $(AMAZING)
 	$(FC) $(FFLAGS) -o amazing $(AMAZING)
@@ -92,6 +96,7 @@ wumpus: $(WUMPUS)
 
 clean:
 	if [ -e acey ];       then rm acey; fi
+	if [ -e acey77 ];     then rm acey77; fi
 	if [ -e amazing ];    then rm amazing; fi
 	if [ -e buzzword ];   then rm buzzword; fi
 	if [ -e delmar ];     then rm delmar; fi

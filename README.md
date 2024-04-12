@@ -10,6 +10,7 @@ for further descriptions.
 | Directory         | Language | Description                                  |
 |-------------------|----------|----------------------------------------------|
 | `src/acey/`       | F2018    | Acey Ducey card game.                        |
+| `src/acey77/`     | F77      | Acey Ducey in FORTRAN 77.                    |
 | `src/amazing/`    | F2018    | Maze generator.                              |
 | `src/buzzword/`   | F2018    | Phrases generator.                           |
 | `src/delmar/`     | F77      | [Horse race](https://cyber.dabamos.de/programming/fortran/computer-games/delmar.html) simulation ported from FORTRAN IV. |
