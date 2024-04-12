@@ -1,0 +1,409 @@
+C     ****************************************************************
+C
+C     WUMPUS
+C
+C     THE TEXT-BASED ADVENTURE GAME "HUNT THE WUMPUS" FROM 1973: FIND
+C     AND KILL THE HORRENDOUS BEAST WUMPUS THAT LURKS IN A CAVE FULL
+C     OF DANGERS. ORIGINALLY WRITTEN BY GREGORY YOB IN BASIC. PORTED
+C     TO FORTRAN IN 2023 BY THE ILLUSTRIOUS PHILIPP ENGEL.
+C
+C     ****************************************************************
+      PROGRAM WUMPUS
+      EXTERNAL HELP, INIT, TURN
+
+      CHARACTER A
+      INTEGER   ISEED, ISTAT
+      LOGICAL   NEXT
+C
+C     SEED THE RANDOM NUMBER GENERATOR.
+C
+      ISEED = ABS(TIME())
+      CALL SRAND(ISEED)
+C
+C     ASK FOR INSTRUCTIONS.
+C
+      PRINT 100
+      READ (*, 200, IOSTAT=ISTAT) A
+      IF (A .EQ. 'Y' .OR. A .EQ. 'y') CALL HELP()
+C
+C     INITIALISE THE GAME.
+C
+      CALL INIT()
+C
+C     RUN UNTIL GAME IS OVER.
+C
+   10 CONTINUE
+      CALL TURN(NEXT)
+      IF (NEXT) GOTO 10
+
+  100 FORMAT (' HUNT THE WUMPUS',/,/,' INSTRUCTIONS? (Y/N) ',$)
+  200 FORMAT (A)
+      END
+C     ****************************************************************
+      INTEGER FUNCTION IADJAC(IFROM)
+C
+C     RETURNS RANDOM ROOM ADJACENT TO IFROM.
+C
+      INTEGER IFROM
+      INTEGER I
+      INTEGER IROOMY(20, 3)
+      COMMON /WORLD/ IROOMY
+
+      I = 1 + INT(RAND(0) * 3)
+      IADJAC = IROOMY(IFROM, I)
+      END
+C     ******************************************************************
+      INTEGER FUNCTION INPUT()
+C
+C     READS PLAYER INPUT (1, 2, OR 3).
+C
+      INTEGER ISTAT
+
+   10 CONTINUE
+      READ (*, 100, IOSTAT=ISTAT) INPUT
+      IF (ISTAT .NE. 0 .OR. INPUT .LT. 1 .OR. INPUT .GT. 3) THEN
+        PRINT 200
+        GOTO 10
+      END IF
+
+  100 FORMAT (I1)
+  200 FORMAT (' INVALID INPUT. TRY AGAIN: ',$)
+      END
+C     ****************************************************************
+      INTEGER FUNCTION IRANDR()
+C
+C     RETURNS RANDOM EMPTY ROOM.
+C
+      LOGICAL EMPTY
+
+   10 CONTINUE
+      IRANDR = 1 + INT(RAND(0) * 20)
+      IF (.NOT. EMPTY(IRANDR)) GOTO 10
+      END
+C     ****************************************************************
+      LOGICAL FUNCTION EMPTY(IROOM)
+C
+C     RETURNS .TRUE. IF GIVEN ROOM IS EMPTY.
+C
+      INTEGER IROOM
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+
+      EMPTY = .FALSE.
+      IF (IROOM .EQ. IHERO    .OR. IROOM .EQ. IWUMP    .OR.
+     &    IROOM .EQ. IBATY(1) .OR. IROOM .EQ. IBATY(2) .OR.
+     &    IROOM .EQ. IPITY(1) .OR. IROOM .EQ. IPITY(2)) RETURN
+      EMPTY = .TRUE.
+      END
+C     ****************************************************************
+      SUBROUTINE HELP()
+C
+C     PRINTS INSTRUCTIONS.
+C
+      CHARACTER A
+      INTEGER   ISTAT
+
+      PRINT 200
+      READ (*, 100, IOSTAT=ISTAT) A
+      PRINT 300
+      READ (*, 100, IOSTAT=ISTAT) A
+      PRINT 400
+      READ (*, 100, IOSTAT=ISTAT) A
+      PRINT 500
+      READ (*, 100, IOSTAT=ISTAT) A
+
+  100 FORMAT (A)
+  200 FORMAT (/,' WELCOME TO "HUNT THE WUMPUS"',/,/,
+     &' THE WUMPUS LIVES IN A CAVE OF 20 ROOMS. EACH ROOM HAS THREE',/,
+     &' TUNNELS LEADING TO OTHER ROOMS. (LOOK AT A DODECAHEDRON TO',/,
+     &' SEE HOW THIS WORKS -- IF YOU DON''T KNOW WHAT A DODECAHEDRON',/,
+     &' IS, ASK SOMEONE.)',/,/,
+     &' HARZARDS:',/,/,
+     &2X,'BOTTOMLESS PITS - TWO ROOMS HAVE BOTTOMLESS PITS IN THEM.',/,
+     &4X,'IF YOU GO THERE, YOU FALL INTO THE PIT (AND LOSE).',/,/,
+     &2X,'SUPER BATS - TWO OTHER ROOMS HAVE SUPER BATS. IF YOU GO',/,
+     &4X,'THERE, A BAT GRABS YOU AND TAKES YOU TO SOME OTHER ROOM',/,
+     &4X,'AT RANDOM. (WHICH MIGHT BE TROUBLESOME)',/,/,
+     &' PRESS RETURN.',$)
+  300 FORMAT (/,' WUMPUS:',/,/,
+     &2X,'THE WUMPUS IS NOT BOTHERED BY THE HAZARDS (HE HAS SUCKER',/,
+     &2X,'FEET AND IS TOO BIG FOR A BAT TO LIFT). USUALLY HE IS',/,
+     &2X,'ASLEEP. TWO THINGS WAKE HIM UP: YOUR ENTERING HIS ROOM OR',/,
+     &2X,'YOUR SHOOTING AN ARROW.',/,/,
+     &2X,'IF THE WUMPUS WAKES, HE MOVES (P=.75) ONE ROOM OR STAYS',/,
+     &2X,'STILL (P=.25). AFTER THAT, IF HE IS WHERE YOU ARE, HE EATS',/,
+     &2X,'YOU UP (AND YOU LOSE).',/,/,
+     &' PRESS RETURN.',$)
+  400 FORMAT (/,' YOU:',/,/,
+     &2X,'EACH TURN YOU MAY MOVE OR SHOOT A CROOKED ARROW.',/,/,
+     &2X,'MOVING: YOU CAN GO ONE ROOM (THRU ONE TUNNEL).',/,
+     &2X,'ARROWS: YOU HAVE 5 ARROWS. YOU LOSE WHEN YOU RUN OUT.',/,/,
+     &2X,'EACH ARROW CAN GO FROM 1 TO 5 ROOMS. YOU AIM BY TELLING',/,
+     &2X,'THE COMPUTER THE ROOMS YOU WANT THE ARROW TO GO TO.',/,
+     &2X,'IF THE ARROW CAN''T GO THAT WAY (I.E. NO TUNNEL) IT',/,
+     &2X,'MOVES AT RAMDOM TO THE NEXT ROOM.',/,/,
+     &2X,'IF THE ARROW HITS THE WUMPUS, YOU WIN.',/,
+     &2X,'IF THE ARROW HITS YOU, YOU LOSE.',/,/,
+     &' PRESS RETURN.',$)
+  500 FORMAT (/,' WARNINGS:',/,/,
+     &2X,'WHEN YOU ARE ONE ROOM AWAY FROM WUMPUS OR HAZARD,',/,
+     &2X,'THE COMPUTER SAYS:',/,/,
+     &2X,'WUMPUS - "YOU SMELL A WUMPUS!"',/,
+     &2X,'BAT    - "BATS NEARBY!"',/,
+     &2X,'PIT    - "YOU FEEL A DRAFT!"',/,/,
+     &' PRESS RETURN.',$)
+      END
+C     ****************************************************************
+      SUBROUTINE INIT()
+C
+C     INITIALISES THE GAME.
+C
+      INTEGER IRANDR
+
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+
+      IBATY(1) = IRANDR()
+      IBATY(2) = IRANDR()
+      IPITY(1) = IRANDR()
+      IPITY(2) = IRANDR()
+      IWUMP = IRANDR()
+      IHERO = IRANDR()
+      NARROW = 5
+      END
+C     ****************************************************************
+      SUBROUTINE MOVE()
+C
+C     MOVES PLAYER.
+C
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      INTEGER IROOMY(20, 3)
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+      COMMON /WORLD/ IROOMY
+
+      INTEGER IROOM, ISTAT
+
+      PRINT 100
+
+   10 CONTINUE
+      READ (*, *, IOSTAT=ISTAT) IROOM
+
+      IF (ISTAT .NE. 0 .OR. IROOM .LT. 1 .OR. IROOM .GT. 20) THEN
+        PRINT 200
+        GOTO 10
+      END IF
+
+      IF (IROOM .NE. IROOMY(IHERO, 1) .AND.
+     &    IROOM .NE. IROOMY(IHERO, 2) .AND.
+     &    IROOM .NE. IROOMY(IHERO, 3)) THEN
+        PRINT 200
+        GOTO 10
+      END IF
+
+      IHERO = IROOM
+
+  100 FORMAT (' WHICH ROOM DO YOU WANT TO ENTER? ',$)
+  200 FORMAT (' INVALID INPUT. TRY AGAIN: ',$)
+      END
+C     ****************************************************************
+      SUBROUTINE SHOOT()
+C
+C     SHOOTS INTO ROOM.
+C
+C
+      INTEGER IADJAC
+
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      INTEGER IROOMY(20, 3)
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+      COMMON /WORLD/ IROOMY
+
+      INTEGER IDIRY(5)
+      INTEGER I, ISTAT, LAST, N, NEXT, NROOMS
+
+      PRINT 100
+
+   10 CONTINUE
+C
+C     INITIALISE DIRECTION ARRAY.
+C
+      DO 20 I = 1, SIZE(IDIRY)
+      IDIRY(I) = 0
+   20 CONTINUE
+C
+C     READ LIST OF ROOMS TO SHOOT INTO.
+C
+      READ (*, 200, IOSTAT=ISTAT) IDIRY
+
+      IF (ISTAT .NE. 0) THEN
+        PRINT 300
+        GOTO 10
+      END IF
+C
+C     VALIDATE INPUT.
+C
+      N = 0
+
+      DO 30 I = 1, SIZE(IDIRY)
+      IF (IDIRY(I) .GT. 0) N = I
+   30 CONTINUE
+
+      IF (N .EQ. 0) THEN
+        PRINT 300
+        GOTO 10
+      END IF
+
+      IF (IDIRY(1) .EQ. IHERO) THEN
+        PRINT 400
+        GOTO 10
+      END IF
+C
+C     SHOOT ARROW IN UP TO FIVE ROOMS.
+C
+      NARROW = NARROW - 1
+      LAST = IHERO
+
+      DO 40 I = 1, N
+      NEXT = IDIRY(I)
+
+      IF ((NEXT .EQ. LAST) .OR. (NEXT .LT. 1) .OR. (NEXT .GT. 20) .OR.
+     &    (NEXT .NE. IROOMY(LAST, 1) .AND.
+     &     NEXT .NE. IROOMY(LAST, 2) .AND.
+     &     NEXT .NE. IROOMY(LAST, 3))) THEN
+        NEXT = IADJAC(LAST)
+      END IF
+
+      IF (NEXT .EQ. IHERO) THEN
+        IHERO = 0
+        RETURN
+      END IF
+
+      IF (NEXT .EQ. IWUMP) THEN
+        IWUMP = 0
+        RETURN
+      END IF
+
+      LAST = NEXT
+   40 CONTINUE
+C
+C     WAKE UP THE WUMPUS.
+C
+      IF (RAND(0) .LT. 0.75) IWUMP = IADJAC(IWUMP)
+
+  100 FORMAT (' ENTER A LIST OF ROOMS TO SHOOT INTO (UP TO 5): ',$)
+  200 FORMAT (5(I2,1X))
+  300 FORMAT (' INVALID INPUT. TRY AGAIN: ',$)
+  400 FORMAT (' YOU HAVE TO AIM INTO AN ADJACENT ROOM, STUPID.')
+      END
+C     ****************************************************************
+      SUBROUTINE TURN(NEXT)
+C
+C     RUNS NEXT TURN.
+C
+      EXTERNAL MOVE, SHOOT
+      INTEGER  INPUT
+
+      LOGICAL NEXT
+
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      INTEGER IROOMY(20, 3)
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+      COMMON /WORLD/ IROOMY
+
+      INTEGER I, IROOM, K
+
+      NEXT = .FALSE.
+
+      IF (IWUMP .EQ. 0) THEN
+        PRINT 200
+        RETURN
+      END IF
+
+      IF (IHERO .EQ. IWUMP) THEN
+        PRINT 300
+        PRINT 100
+        RETURN
+      END IF
+
+      IF (IHERO .EQ. 0) THEN
+        PRINT 400
+        PRINT 100
+        RETURN
+      END IF
+
+      IF (NARROW .LT. 1) THEN
+        PRINT 500
+        PRINT 100
+        RETURN
+      END IF
+
+      IF (IHERO .EQ. IPITY(1) .OR. IHERO .EQ. IPITY(2)) THEN
+        PRINT 600
+        PRINT 100
+        RETURN
+      END IF
+
+      IF (IHERO .EQ. IBATY(1) .OR. IHERO .EQ. IBATY(2)) THEN
+        PRINT 700
+        IHERO = IRANDR()
+      END IF
+
+      PRINT 800, IHERO
+
+      DO 10, I = 3, 1, -1
+      IROOM = IROOMY(IHERO, I)
+      IF (IROOM .EQ. IWUMP) PRINT 900
+      IF (IROOM .EQ. IBATY(1) .OR. IROOM .EQ. IBATY(2)) PRINT 1000
+      IF (IROOM .EQ. IPITY(1) .OR. IROOM .EQ. IPITY(2)) PRINT 1100
+   10 CONTINUE
+
+      PRINT 1200, NARROW, IROOMY(IHERO, 1), IROOMY(IHERO, 2),
+     &            IROOMY(IHERO, 3)
+
+      K = INPUT()
+
+      IF (K .EQ. 1) THEN
+        CALL MOVE()
+      ELSE IF (K .EQ. 2) THEN
+        CALL SHOOT()
+      ELSE IF (K .EQ. 3) THEN
+        RETURN
+      END IF
+
+      NEXT = .TRUE.
+
+  100 FORMAT (' GAME OVER.')
+  200 FORMAT (' AHA! YOU GOT THE WUMPUS!')
+  300 FORMAT (' YOU FIND YOURSELF FACE TO FACE WITH THE WUMPUS.',
+     &' IT EATS YOU WHOLE.')
+  400 FORMAT (' OUCH! ARROW GOT YOU!')
+  500 FORMAT (' YOU HAVE RUN OUT OF ARROWS!')
+  600 FORMAT (' AAAAAAAAAAA! YOU HAVE FALLEN INTO A BOTTOMLESS PIT.')
+  700 FORMAT (' A BAT HAS CARRIED YOU INTO ANOTHER EMPTY ROOM.')
+  800 FORMAT (/,' YOU ARE IN ROOM ',I2,'.')
+  900 FORMAT (' YOU SMELL A WUMPUS!')
+ 1000 FORMAT (' BATS NEARBY!')
+ 1100 FORMAT (' YOUR FEEL A DRAFT!')
+ 1200 FORMAT (' YOU HAVE ',I1,' ARROWS. TUNNELS LEAD TO ',I2,', ',I2,
+     &' AND ',I2,'.',/,' (1) MOVE  (2) SHOOT  (3) QUIT: ',$)
+      END
+C     ****************************************************************
+      BLOCK DATA
+C
+C     COMMON VARIABLES:
+C
+C     IBATY  - ROOMS OF BATS (2).
+C     IPITY  - ROOMS OF PITS (2).
+C     IWUMP  - ROOM OF WUMPUS.
+C     IHERO  - ROOM OF PLAYER.
+C     NARROW - NUMBER OF ARROWS LEFT.
+C     IROOMY - CONNECTIONS BETWEEN ROOMS.
+C
+      INTEGER IBATY(2), IPITY(2), IWUMP, IHERO, NARROW
+      INTEGER IROOMY(20, 3)
+      COMMON /STATE/ IBATY, IPITY, IWUMP, IHERO, NARROW
+      COMMON /WORLD/ IROOMY
+      DATA IROOMY /2,1,2,3,1,5,6,1,8,2,10,3,12,4,6,15,7,9,11,13,
+     &5,3,4,5,4,7,8,7,10,9,12,11,14,13,14,17,16,17,18,16,
+     &8,10,12,14,6,15,17,9,18,11,19,13,20,15,16,20,18,19,20,19/
+      END
