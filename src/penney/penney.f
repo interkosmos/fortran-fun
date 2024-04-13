@@ -33,7 +33,7 @@ C
       INTEGER IUSR
 
       IF (IUSR .EQ. -1) THEN
-        CMPSEQ = NINT(RAND(0) * 7)
+        CMPSEQ = NINT(RAND() * 7)
       ELSE
         CMPSEQ = IOR(ISHFT(IUSR, -1),
      &               IAND(ISHFT(NOT(IUSR), 1), ISHFT(1, 2)))
@@ -93,7 +93,7 @@ C
       INTEGER  ICMP, IUSR
       INTEGER  ILAST
 
-      ILAST = NINT(RAND(0) * 7)
+      ILAST = NINT(RAND() * 7)
       PRINT 100
       CALL OUTSEQ(ILAST)
 
@@ -106,7 +106,7 @@ C
         RETURN
       END IF
 
-      ILAST = IOR(IAND(ISHFT(ILAST, 1), 6), NINT(RAND(0)))
+      ILAST = IOR(IAND(ISHFT(ILAST, 1), 6), NINT(RAND()))
 
       IF (IAND(ILAST, 1) .EQ. 1) THEN
         PRINT 200, 'H'
@@ -148,7 +148,7 @@ C
       IUSR = -1
       ICMP = -1
 
-      IF (RAND(0) .GE. 0.5) THEN
+      IF (RAND() .GE. 0.5) THEN
         PRINT 100
         IUSR = USRSEQ(ICMP)
         ICMP = CMPSEQ(IUSR)

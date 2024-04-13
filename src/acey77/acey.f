@@ -6,7 +6,7 @@ C
 C     *****************************************************************
       PROGRAM ACEY
       EXTERNAL  PLAY
-      CHARACTER INPUT
+      CHARACTER ANS
       INTEGER   ISTAT
       LOGICAL   DONE
 C
@@ -24,8 +24,8 @@ C
 C     PLAY AGAIN?
 C
       PRINT 110
-      READ (*, 200, IOSTAT=ISTAT) INPUT
-      IF (INPUT .NE. 'Y' .AND. INPUT .NE. 'y') DONE = .TRUE.
+      READ (*, 200, IOSTAT=ISTAT) ANS
+      IF (ANS .NE. 'Y' .AND. ANS .NE. 'y') DONE = .TRUE.
       IF (.NOT. DONE) GOTO 10
       PRINT 120
 
@@ -48,7 +48,7 @@ C     *****************************************************************
 C
 C     DEALS CARD. RETURNS RANDOM INTEGER IN RANGE [1, 13].
 C
-      DEAL = 1 + INT(RAND(0) * 12)
+      DEAL = 1 + NINT(RAND() * 12)
       END
 C     *****************************************************************
       SUBROUTINE PLAY()
@@ -58,8 +58,8 @@ C
       EXTERNAL OUTPUT
       INTEGER  DEAL
 
-      INTEGER  IBANKR, IBET, IDEAL1, IDEAL2, ISTAT, IPLAYR, ISWAP
-      LOGICAL  VALID
+      INTEGER IBANKR, IBET, IDEAL1, IDEAL2, ISTAT, IPLAYR, ISWAP
+      LOGICAL VALID
 
       INTEGER     JBANKR
       CHARACTER*5 CARDS(13)
@@ -163,6 +163,6 @@ C
       CHARACTER*5 CARDS(13)
       COMMON /GLOBAL/ JBANKR, CARDS
       DATA JBANKR /100/
-      DATA CARDS  /'2','3','4','5','6','7','8','9','10','JACK','QUEEN',
-     &             'KING','ACE'/
+      DATA CARDS  /'2','3','4','5','6','7','8','9','10',
+     &             'JACK','QUEEN','KING','ACE'/
       END

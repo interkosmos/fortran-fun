@@ -49,7 +49,7 @@ C
       INTEGER IROOMY(20, 3)
       COMMON /WORLD/ IROOMY
 
-      I = 1 + INT(RAND(0) * 3)
+      I = 1 + INT(RAND() * 3)
       IADJAC = IROOMY(IFROM, I)
       END
 C     ******************************************************************
@@ -77,7 +77,7 @@ C
       LOGICAL EMPTY
 
    10 CONTINUE
-      IRANDR = 1 + INT(RAND(0) * 20)
+      IRANDR = 1 + INT(RAND() * 20)
       IF (.NOT. EMPTY(IRANDR)) GOTO 10
       END
 C     ****************************************************************
@@ -118,7 +118,7 @@ C
      &' TUNNELS LEADING TO OTHER ROOMS. (LOOK AT A DODECAHEDRON TO',/,
      &' SEE HOW THIS WORKS -- IF YOU DON''T KNOW WHAT A DODECAHEDRON',/,
      &' IS, ASK SOMEONE.)',/,/,
-     &' HARZARDS:',/,/,
+     &' HAZARDS:',/,/,
      &2X,'BOTTOMLESS PITS - TWO ROOMS HAVE BOTTOMLESS PITS IN THEM.',/,
      &4X,'IF YOU GO THERE, YOU FALL INTO THE PIT (AND LOSE).',/,/,
      &2X,'SUPER BATS - TWO OTHER ROOMS HAVE SUPER BATS. IF YOU GO',/,
@@ -219,7 +219,7 @@ C
       COMMON /WORLD/ IROOMY
 
       INTEGER IDIRY(5)
-      INTEGER I, ISTAT, LAST, N, NEXT, NROOMS
+      INTEGER I, ISTAT, LAST, N, NEXT
 
       PRINT 100
 
@@ -288,7 +288,7 @@ C
 C
 C     WAKE UP THE WUMPUS.
 C
-      IF (RAND(0) .LT. 0.75) IWUMP = IADJAC(IWUMP)
+      IF (RAND() .LT. 0.75) IWUMP = IADJAC(IWUMP)
 
   100 FORMAT (' ENTER A LIST OF ROOMS TO SHOOT INTO (UP TO 5): ',$)
   200 FORMAT (5(I2,1X))

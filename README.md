@@ -13,7 +13,7 @@ for further descriptions.
 | `src/acey77/`     | F77      | Acey Ducey in FORTRAN 77.                    |
 | `src/amazing/`    | F2018    | Maze generator.                              |
 | `src/buzzword/`   | F2018    | Phrases generator.                           |
-| `src/delmar/`     | F77      | [Horse race](https://cyber.dabamos.de/programming/fortran/computer-games/delmar.html) simulation ported from FORTRAN IV. |
+| `src/delmar/`     | F77      | [Horse race simulation](https://cyber.dabamos.de/programming/fortran/computer-games/delmar.html) ported from FORTRAN IV. |
 | `src/donut/`      | F77      | Spinning ASCII donut.                        |
 | `src/french/`     | F77      | French variant of hangman game.              |
 | `src/hamurabi/`   | F2018    | Ancient city management game.                |
@@ -37,6 +37,12 @@ Just execute the Makefile:
 
 ```
 $ make
+```
+
+Overwrite the argument `FC` to switch the Fortran compiler:
+
+```
+$ make FC=ifx
 ```
 
 ## Licence

@@ -45,7 +45,7 @@ program main
     do
         call random_number(r)
 
-        i = [ (13 * r(1) + 1), (13 * r(2) + 14), (13 * r(3) + 27) ]
+        i = [ int(13 * r(1) + 1), int(13 * r(2) + 14), int(13 * r(3) + 27) ]
 
         print '(/, a, 1x, a, 1x, a, /)', trim(WORDS(i(1))), &
                                          trim(WORDS(i(2))), &

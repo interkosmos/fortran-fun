@@ -67,7 +67,6 @@ program main
 
             do while (.not. valid)
                 print '(/, "What is your bet?")'
-
                 read (*, *, iostat=stat) bet
 
                 if (stat /= 0) then
@@ -94,19 +93,15 @@ program main
                         bankroll = bankroll - bet
                     end if
 
-                    if (bankroll > 0) &
-                        print '(/, "You now have $", i0, ".")', bankroll
+                    if (bankroll > 0) print '(/, "You now have $", i0, ".")', bankroll
                 end if
             end do
         end do
 
         print '(/, "Sorry, my friend but you blew your wad.")'
         print '("Try again? (yes or no)")'
-
         read (*, *) input
-
-        if (input(1:1) /= 'Y' .and. input(1:1) /= 'y') &
-            done = .true.
+        if (input(1:1) /= 'Y' .and. input(1:1) /= 'y') done = .true.
     end do
 
     print '("OK. Hope you had fun.")'
